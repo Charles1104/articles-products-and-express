@@ -1,0 +1,30 @@
+{
+  "name": "articles-products-and-express",
+  "version": "1.0.0",
+  "description": "Product/article assignment",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --watch tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Charles1104/articles-products-and-express.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Charles1104/articles-products-and-express/issues"
+  },
+  "homepage": "https://github.com/Charles1104/articles-products-and-express#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+    "express-handlebars": "^3.0.0",
+    "query-string": "^4.3.4"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "supertest": "^3.0.0"
+  }
+}
