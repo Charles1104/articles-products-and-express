@@ -2,15 +2,16 @@
 
 <h1> Product to edit </h1>
 
-<div class="product">
-  <h2> ID: {{id}}</h2>
+<form method="POST" action="/products/{{id}}?_method=PUT" enctype="application/x-www-form-urlencoded">
+
   <ol>
-    <li> Name:      <input type="text" value={{name}}> </li>
-    <li> Price:     <input type="text" value={{price}}> </li>
-    <li> Inventory: <input type="text" value={{inventory}}> </li>
+    <li> Name:        <input name="name" type="text" value={{name}}> </li>
+    <li> Price:       <input name="price" type="text" value={{price}}> </li>
+    <li> Inventory:   <input name="inventory" type="text" value={{inventory}}> </li>
   </ol>
 
-  <button type="button"> EDIT </button>
+  <button type="submit"> EDIT </button>
 
-</div>
+
+</form>
 

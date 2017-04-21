@@ -6,14 +6,14 @@ const queryString = require('query-string');
 
 const postValidation = ((req, res, next) => {
 
-  let productsListName = products.getProducts().map(function(x){return x.name;});
   let error = {};
 
   if(!req.body.hasOwnProperty("name") || !req.body.hasOwnProperty("price") || !req.body.hasOwnProperty("inventory")){
     error.message = "You need the following properties: 'name', 'price' and 'inventory'";
     return res.redirect(`/products/new?${queryString.stringify(error)}`);
   }
-  if(productsListName.indexOf(req.body.name) !== -1){
+
+  if(products.getNames().indexOf(req.body.name) !== -1){
     error.message = "Name already exists";
     return res.redirect(`/products/new?${queryString.stringify(error)}`);
   }
@@ -24,16 +24,15 @@ const putValidation = ((req, res, next) => {
 
   let error = {};
   let query = {};
-  let productsListId = products.getProducts().map(function(x){return x.id;});
 
-  if(productsListId.indexOf(Number(req.params.id)) === -1){
+  if(products.getIndex(req.params.id) === -1){
     error.message = "This is an unknown ID. Please enter a valid ID";
     return res.redirect(303,`/products/:id/edit?${queryString.stringify(error)}`);
   }
 
   else {
-    res.index = productsListId.indexOf(Number(req.params.id));
-    res.productToEdit = products.getProducts()[productsListId.indexOf(Number(req.params.id))];
+    res.index = products.getIndex(req.params.id);
+    res.productToEdit = products.getProducts(req.params.id);
     query.id = req.params.id;
     res.idQuery = query;
   }
@@ -92,29 +91,24 @@ router.route('/new')
   });
 
 router.route('/:id')
-.get( (req, res) => {
-
-  if(isNaN(Number(req.query.id))){
-    res.render('products/product',products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.params.id))]);
-  } else{
-  res.render('products/product',products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.query.id))]);
-  }
-
+  .get( (req, res) => {
+    if(isNaN(Number(req.query.id))){
+      res.render('products/product',products.getProducts(req.params.id));
+    } else{
+    res.render('products/product',products.getProduct(req.query.id));
+    }
 });
 
 router.route('/:id/edit')
   .get( (req, res) => {
 
-    console.log(req.query.message);
     if(req.query.message === undefined){
-      console.log( products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.params.id))]);
-      res.render('products/edit', products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.params.id))]);
+      res.render('products/edit', products.getProduct(req.params.id));
     } else {
       req.query.id = "Enter a valid ID";
       req.query.name = "To be displayed after entering an ID";
       req.query.price = "To be displayed after entering an ID";
       req.query.inventory = "To be displayed after entering an ID";
-      console.log(req.query);
       res.render('products/edit', req.query);
     }
 
