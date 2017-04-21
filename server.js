@@ -24,9 +24,9 @@ app.use('/articles', articlesRoutes);
 app.use('/products', productsRoutes);
 
 
-app.get('/', (req, res)=> {
-  res.render('home', homeData);
-});
+// app.get('/', (req, res)=> {
+//   res.render('home', homeData);
+// });
 
 app.get("*", (req, res) => {
   res.send("404");

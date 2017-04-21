@@ -23,64 +23,94 @@ const postValidation = ((req, res, next) => {
 const putValidation = ((req, res, next) => {
 
   let error = {};
+  let query = {};
   let productsListId = products.getProducts().map(function(x){return x.id;});
 
   if(productsListId.indexOf(Number(req.params.id)) === -1){
-
-    console.log("test1");
-
     error.message = "This is an unknown ID. Please enter a valid ID";
-    return res.redirect(`/products/new?${queryString.stringify(error)}`);
+    return res.redirect(303,`/products/new?${queryString.stringify(error)}`);
   }
 
-  // else {
-  //   res.productToEdit = products.getProducts()[productsListId.indexOf(req.params.id)];
-  // }
+  else {
+    res.index = productsListId.indexOf(Number(req.params.id));
+    res.productToEdit = products.getProducts()[productsListId.indexOf(Number(req.params.id))];
+    query.id = req.params.id;
+    res.idQuery = query;
+  }
 
-  // for(var key in req.body){
-  //   if(key !== 'id' && key !== 'name' && key !== 'inventory' && key !== 'price'){
-  //     error.message = "Some of the properties you want to edit do not exist or are mispelled";
-  //     return res.redirect(`/products/new?${queryString.stringify(error)}`);
-  //   }
-  // }
+  for(var key in req.body){
+    if(key !== 'id' && key !== 'name' && key !== 'inventory' && key !== 'price'){
+      error.message = "Some of the properties you want to edit do not exist or are mispelled";
+      return res.redirect(303,`/products/new?${queryString.stringify(error)}`);
+    }
+    if(key === "price" || key === "inventory"){
+      req.body[key] = Number(req.body[key]);
+    }
+  }
   next();
 });
+
+// POST
 
 router.route('/')
   .post(postValidation, (req, res) => {
       products.registerProduct(req.body);
-      res.redirect('/products/index');
+      res.redirect('/products/');
   });
+
+// PUT
 
 router.route('/:id')
   .put(putValidation, (req, res) => {
-    // for (var key in req.body){
-    //   res.productToEdit[key] = req.body[key];
-    // }
-    res.redirect('/products/index');
+    for (var key in req.body){
+      res.productToEdit[key] = req.body[key];
+    }
+    res.redirect(303, `/products/product?${queryString.stringify(res.idQuery)}`);
   });
 
-router.route('/index')
+// DELETE
+
+router.route('/:id')
+  .delete(putValidation, (req, res) => {
+    products.getProducts().splice(res.index,1);
+    res.redirect('/products/');
+  });
+
+// GET
+
+router.route('/')
   .get( (req, res) => {
+    console.log("index");
     let productsData = {
       listProducts: products.getProducts()
     };
     res.render('products/index', productsData);
   });
 
+router.route('/product')
+.get( (req, res) => {
+  console.log("product");
+  res.render('products/product',products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.query.id))]);
+});
+
+router.route('/:id')
+.get( (req, res) => {
+  console.log("id");
+  res.render('products/product',products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.params.id))]);
+});
+
 router.route('/new')
   .get( (req, res) => {
-    console.log("test2");
+    console.log("new");
     res.render('products/new', req.query);
   });
 
-
-router.delete( (req, res) => {
-    if(req.body.hasOwnProperty("name")){
-      router.route('/products/new');
-    } else{
-      router.route('/products/:id/edit');
-    }
+router.route('/edit')
+  .get( (req, res) => {
+    console.log("edit");
+    res.render('products/edit', res.productToEdit);
   });
+
+
 
 module.exports = router;

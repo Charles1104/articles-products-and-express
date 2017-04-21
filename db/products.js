@@ -15,8 +15,5 @@ module.exports = (function(){
   return {
     registerProduct: registerProduct,
     getProducts: getProducts
-    // add: _add,
-    // getByTitle: _getByTitle,
-    // editByTitle: _editByTitle
   };
 })();
