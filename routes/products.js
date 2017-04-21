@@ -28,7 +28,7 @@ const putValidation = ((req, res, next) => {
 
   if(productsListId.indexOf(Number(req.params.id)) === -1){
     error.message = "This is an unknown ID. Please enter a valid ID";
-    return res.redirect(303,`/products/new?${queryString.stringify(error)}`);
+    return res.redirect(303,`/products/:id/edit?${queryString.stringify(error)}`);
   }
 
   else {
@@ -41,7 +41,7 @@ const putValidation = ((req, res, next) => {
   for(var key in req.body){
     if(key !== 'id' && key !== 'name' && key !== 'inventory' && key !== 'price'){
       error.message = "Some of the properties you want to edit do not exist or are mispelled";
-      return res.redirect(303,`/products/new?${queryString.stringify(error)}`);
+      return res.redirect(303,`/products/:id/edit?${queryString.stringify(error)}`);
     }
     if(key === "price" || key === "inventory"){
       req.body[key] = Number(req.body[key]);
@@ -65,7 +65,7 @@ router.route('/:id')
     for (var key in req.body){
       res.productToEdit[key] = req.body[key];
     }
-    res.redirect(303, `/products/product?${queryString.stringify(res.idQuery)}`);
+    res.redirect(303, `/products/:id?${queryString.stringify(res.idQuery)}`);
   });
 
 // DELETE
@@ -80,35 +80,44 @@ router.route('/:id')
 
 router.route('/')
   .get( (req, res) => {
-    console.log("index");
     let productsData = {
       listProducts: products.getProducts()
     };
     res.render('products/index', productsData);
   });
 
-router.route('/product')
-.get( (req, res) => {
-  console.log("product");
-  res.render('products/product',products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.query.id))]);
-});
-
-router.route('/:id')
-.get( (req, res) => {
-  console.log("id");
-  res.render('products/product',products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.params.id))]);
-});
-
 router.route('/new')
   .get( (req, res) => {
-    console.log("new");
     res.render('products/new', req.query);
   });
 
-router.route('/edit')
+router.route('/:id')
+.get( (req, res) => {
+
+  if(isNaN(Number(req.query.id))){
+    res.render('products/product',products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.params.id))]);
+  } else{
+  res.render('products/product',products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.query.id))]);
+  }
+
+});
+
+router.route('/:id/edit')
   .get( (req, res) => {
-    console.log("edit");
-    res.render('products/edit', res.productToEdit);
+
+    console.log(req.query.message);
+    if(req.query.message === undefined){
+      console.log( products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.params.id))]);
+      res.render('products/edit', products.getProducts()[products.getProducts().map(function(x){return x.id;}).indexOf(Number(req.params.id))]);
+    } else {
+      req.query.id = "Enter a valid ID";
+      req.query.name = "To be displayed after entering an ID";
+      req.query.price = "To be displayed after entering an ID";
+      req.query.inventory = "To be displayed after entering an ID";
+      console.log(req.query);
+      res.render('products/edit', req.query);
+    }
+
   });
 
 
