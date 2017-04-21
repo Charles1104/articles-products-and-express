@@ -23,18 +23,11 @@ const postValidation = ((req, res, next) => {
 const putValidation = ((req, res, next) => {
 
   let error = {};
-  let query = {};
+  let idQuery = {id: `${req.params.id}`};
 
   if(products.getIndex(req.params.id) === -1){
     error.message = "This is an unknown ID. Please enter a valid ID";
     return res.redirect(303,`/products/:id/edit?${queryString.stringify(error)}`);
-  }
-
-  else {
-    res.index = products.getIndex(req.params.id);
-    res.productToEdit = products.getProducts(req.params.id);
-    query.id = req.params.id;
-    res.idQuery = query;
   }
 
   for(var key in req.body){
@@ -46,6 +39,9 @@ const putValidation = ((req, res, next) => {
       req.body[key] = Number(req.body[key]);
     }
   }
+
+  res.test = idQuery;
+
   next();
 });
 
@@ -62,16 +58,16 @@ router.route('/')
 router.route('/:id')
   .put(putValidation, (req, res) => {
     for (var key in req.body){
-      res.productToEdit[key] = req.body[key];
+      products.getProduct(req.params.id)[key] = req.body[key];
     }
-    res.redirect(303, `/products/:id?${queryString.stringify(res.idQuery)}`);
+    res.redirect(303, `/products/:id?${queryString.stringify(res.test)}`);
   });
 
 // DELETE
 
 router.route('/:id')
   .delete(putValidation, (req, res) => {
-    products.getProducts().splice(res.index,1);
+    products.getProducts().splice(products.getIndex(req.params.id),1);
     res.redirect('/products/');
   });
 
@@ -92,28 +88,27 @@ router.route('/new')
 
 router.route('/:id')
   .get( (req, res) => {
+
     if(isNaN(Number(req.query.id))){
-      res.render('products/product',products.getProducts(req.params.id));
+      console.log(products.getProduct(req.params.id));
+      res.render('products/product',products.getProduct(req.params.id));
     } else{
-    res.render('products/product',products.getProduct(req.query.id));
+      res.render('products/product',products.getProduct(Number(req.query.id)));
     }
 });
 
 router.route('/:id/edit')
   .get( (req, res) => {
 
+    console.log(req.query);
+
     if(req.query.message === undefined){
       res.render('products/edit', products.getProduct(req.params.id));
     } else {
-      req.query.id = "Enter a valid ID";
-      req.query.name = "To be displayed after entering an ID";
-      req.query.price = "To be displayed after entering an ID";
-      req.query.inventory = "To be displayed after entering an ID";
-      res.render('products/edit', req.query);
+      res.render('products/edit', {"message": `${req.query.message}`, "inventory":"hi", "name": "hi", "price":"hi", inventory: ""});
     }
 
   });
-
 
 
 module.exports = router;

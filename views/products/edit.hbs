@@ -1,6 +1,6 @@
 <p>{{{message}}}</p>
 
-<h1> Product to edit </h1>
+<h1> Product to edit - ID : {{id}} </h1>
 
 <form method="POST" action="/products/{{id}}?_method=PUT" enctype="application/x-www-form-urlencoded">
 
@@ -12,6 +12,12 @@
 
   <button type="submit"> EDIT </button>
 
+</form>
+
+ <form method="POST" action="/products/{{id}}?_method=DELETE" enctype="application/x-www-form-urlencoded">
+
+  <button type="submit"> DELETE </button>
 
 </form>
+
 
