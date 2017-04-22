@@ -1,20 +1,20 @@
 <p>{{{message}}}</p>
 
-<h1> Product to edit - ID : {{id}} </h1>
+<h1> Article to edit </h1>
 
-<form method="POST" action="/products/{{id}}?_method=PUT" enctype="application/x-www-form-urlencoded">
+<form method="POST" action="/articles/{{title}}?_method=PUT" enctype="application/x-www-form-urlencoded">
 
   <ol>
-    <li> Name:        <input name="name" type="text" value={{name}}> </li>
-    <li> Price:       <input name="price" type="text" value={{price}}> </li>
-    <li> Inventory:   <input name="inventory" type="text" value={{inventory}}> </li>
+    <li> Title:        <input name="title" type="textbox" value="{{title}}"> </li>
+    <li> Body:       <input name="body" type="textbox" value="{{body}}"> </li>
+    <li> Author:   <input name="author" type="textbox" value="{{author}}"> </li>
   </ol>
 
   <button type="submit"> EDIT </button>
 
 </form>
 
- <form method="POST" action="/products/{{id}}?_method=DELETE" enctype="application/x-www-form-urlencoded">
+ <form method="POST" action="/articles/{{title}}?_method=DELETE" enctype="application/x-www-form-urlencoded">
 
   <button type="submit"> DELETE </button>
 

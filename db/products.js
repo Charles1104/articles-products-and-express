@@ -7,16 +7,16 @@ module.exports = (function(){
     return productsArray;
   }
 
+  function getProduct(number){
+    return productsArray[productsArray.map(function(x){return x.id;}).indexOf(Number(number))];
+  }
+
   function getNames(){
     return productsArray.map(function(x){return x.name;});
   }
 
   function getIndex(number){
     return productsArray.map(function(x){return x.id;}).indexOf(Number(number));
-  }
-
-  function getProduct(number){
-    return productsArray[productsArray.map(function(x){return x.id;}).indexOf(Number(number))];
   }
 
   function registerProduct(req){

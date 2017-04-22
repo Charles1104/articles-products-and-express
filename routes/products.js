@@ -17,8 +17,6 @@ const postValidation = ((req, res, next) => {
 
 const putValidation = ((req, res, next) => {
 
-  let idQuery = {id: `${req.params.id}`};
-
   if(products.getIndex(req.params.id) === -1){
     res.render('products/new',{"message": "Impossible to edit this product. Unknown ID"});
   }
@@ -29,6 +27,7 @@ const putValidation = ((req, res, next) => {
       req.body[key] = Number(req.body[key]);
     }
   }
+  let idQuery = {id: `${req.params.id}`};
   res.test = idQuery;
 
   next();
@@ -73,7 +72,6 @@ router.route('/new')
 router.route('/:id')
   .get( (req, res) => {
     if(isNaN(Number(req.query.id))){
-      console.log(products.getProduct(req.params.id));
       res.render('products/product',products.getProduct(req.params.id));
     } else{
       res.render('products/product',products.getProduct(Number(req.query.id)));

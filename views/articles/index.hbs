@@ -1,13 +1,15 @@
-<h1> List of products </h1>
+{{message}}
 
-<div class="products">
-{{#each listProducts}}
-<div class="product">
-  <h2> Name: {{name}}</h2>
+<h1> List of articles </h1>
+
+<div class="articles">
+{{#each listArticles}}
+<div class="article">
+  <h2> Title: {{title}}</h2>
   <ol>
-    <li> ID: {{id}}</li>
-    <li> Price: {{price}}</li>
-    <li> Inventory: {{inventory}}</li>
+    <li> Body: {{body}}</li>
+    <li> Author: {{author}}</li>
+    <li> URL: {{urlTitle}}</li>
   </ol>
 </div>
 {{/each}}
