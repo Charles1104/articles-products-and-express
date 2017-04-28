@@ -20,11 +20,35 @@ module.exports = (function(){
       });
   }
 
+  function getArticle(string){
+    return db.one(`SELECT * FROM articles WHERE title = '${string}'`)
+      .catch(function(error) {
+        console.log('This article does not exist');
+      });
+  }
+
+  function registerArticle(req){
+    return db.none('INSERT INTO articles(title, body, author) VALUES($1, $2, $3)', [req.body.title, req.body.body, req.body.author])
+      .then(() => {
+      console.log("success post");
+      })
+      .catch(error => {
+      console.log("failure database post", error);
+      });
+  }
+
   function editArticle(req){
-    return db.none(`UPDATE articles SET title = '${req.body.title}', body = '${req.body.body}', author = '${req.body.author}' WHERE title = '${req.params.title}'`)
+    if (req.body.title === undefined){
+      return db.none('UPDATE articles SET body = $1 , author = $2, updated_at = now()  WHERE title = $3',[req.body.body, req.body.author, req.params.title])
       .catch(function(error) {
         console.log('failure database put',error);
       });
+    } else {
+       return db.none('UPDATE articles SET title = $1, body = $2 , author = $3, updated_at = now()  WHERE title = $4',[req.body.title, req.body.body, req.body.author, req.params.title])
+        .catch(function(error) {
+        console.log('failure database put',error);
+      });
+    }
   }
 
   function deleteArticle(req){
@@ -34,40 +58,12 @@ module.exports = (function(){
       });
   }
 
-  function getArticle(string){
-    return db.one(`SELECT * FROM articles WHERE title = '${string}'`)
-      .catch(function(error) {
-        console.log('failure database get articles/title', error);
-      });
-  }
-
-  function getTitles(){
-    return articlesArray.map(function(x){return x.title;});
-  }
-
-  function getIndex(string){
-    return articlesArray.map(function(x){return x.title;}).indexOf(string);
-  }
-
-  function registerArticle(req){
-
-    articlesArray.push(
-    {
-      "title": req.title,
-      "body": req.body,
-      "author": req.author,
-      "urlTitle": encodeURI(req.title)
-    });
-  }
 
   return {
-    getArticles: getArticles,
     getArticle: getArticle,
-    getTitles: getTitles,
-    getIndex: getIndex,
+    getArticles: getArticles,
     registerArticle: registerArticle,
     editArticle: editArticle,
     deleteArticle: deleteArticle,
-    db: db
   };
 })();
