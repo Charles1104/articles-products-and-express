@@ -21,8 +21,8 @@ const putValidation = ((req, res, next) => {
     return res.render('articles/new',{"message": "Impossible to edit this article. Unknown title"});
   }
   for(var key in req.body){
-    if(key !== 'title' && key !== 'name' && key !== 'inventory' && key !== 'price'){
-      return res.end("Some of the properties you want to edit do not exist or are mispelled");
+    if(key !== 'title' && key !== 'body' && key !== 'author'){
+      return res.render('articles/new', {"message":"Some of the properties you want to edit do not exist or are mispelled"});
     }
   }
   let titleQuery = {title: `${req.params.title}`};
@@ -33,33 +33,48 @@ const putValidation = ((req, res, next) => {
 
 // POST
 router.route('/')
-  .post(postValidation, (req, res) => {
-    articles.registerArticle(req.body);
+  .post((req, res) => {
+    articles.db.none('INSERT INTO articles(title, body, author) VALUES($1, $2, $3)', [`${req.body.title}`, `${req.body.body}`, `${req.body.author}`])
+      .then(() => {
+      console.log("success post");
+      })
+      .catch(error => {
+      console.log("failure post", error);
+      });
     res.redirect('/articles/');
   });
 
 // PUT
 router.route('/:title')
-  .put(putValidation, (req, res) => {
-    articles.editArticle(req);
-    res.redirect(303, `/articles/:title?${queryString.stringify(res.test)}`);
+  .put((req, res) => {
+    articles.editArticle(req)
+      .then(data => {
+        console.log(data);
+        res.redirect(303, `/articles/${req.params.title}`);
+      });
   });
 
 // DELETE
 router.route('/:title')
-  .delete(putValidation, (req, res) => {
-    articles.deleteArticle(req.params.title);
-    res.redirect(`/articles/?message=element%20with%20title%20${req.params.title}%20has%20been%20deleted`);
+  .delete((req, res) => {
+    articles.deleteArticle(req)
+      .then(data => {
+        console.log(data);
+        res.redirect(303, '/articles/');
+      });
   });
 
 // GET
 router.route('/')
   .get( (req, res) => {
-    let articlesData = {
-      listArticles: articles.getArticles(),
-      message: req.query.message
-    };
-    res.render('articles/index', articlesData);
+    articles.getArticles()
+      .then(data => {
+        let articlesData = {
+          listArticles: data,
+          message: req.query.message
+        };
+        res.render('articles/index', articlesData);
+      });
   });
 
 router.route('/new')
@@ -69,11 +84,11 @@ router.route('/new')
 
 router.route('/:title')
   .get( (req, res) => {
-    if(isNaN(Number(req.query.title))){
-      res.render('articles/article',articles.getArticle(req.params.title));
-    } else{
-      res.render('articles/article',articles.getArticle(Number(req.query.title)));
-    }
+    articles.getArticle(req.params.title)
+      .then(data => {
+        console.log(data);
+        res.render('articles/article',data);
+      });
 });
 
 router.route('/:title/edit')
@@ -81,7 +96,6 @@ router.route('/:title/edit')
     if(articles.getArticle(req.params.title) === undefined){
       res.render('articles/new',{"message": "Impossible to edit this article. Unknown title"});
     } else{
-      console.log(articles.getArticle(req.params.title));
       res.render('articles/edit', articles.getArticle(req.params.title));
     }
   });

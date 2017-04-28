@@ -51,7 +51,7 @@ router.route('/:id')
 router.route('/:id')
   .delete(putValidation, (req, res) => {
     products.deleteProduct(req.params.id);
-    res.redirect(`/products/?message=element%20with%20id%20${req.params.id}%20has%20been%20deleted`);
+    res.redirect(303,`/products/?message=element%20with%20id%20${req.params.id}%20has%20been%20deleted`);
   });
 
 // GET

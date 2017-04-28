@@ -1,13 +1,44 @@
+/*jshint esversion: 6 */
+var pgp = require('pg-promise')();
+
 module.exports = (function(){
 
-  let articlesArray = [];
+  var connection = {
+  host: 'localhost',
+  port: 5432,
+  database: 'articles_products',
+  user: 'article',
+  password: 'toto'
+  };
+
+  var db = pgp(connection);
 
   function getArticles(){
-    return articlesArray;
+   return db.any('SELECT * FROM articles')
+      .catch(function(error) {
+        console.log('failure database get articles/');
+      });
+  }
+
+  function editArticle(req){
+    return db.none(`UPDATE articles SET title = '${req.body.title}', body = '${req.body.body}', author = '${req.body.author}' WHERE title = '${req.params.title}'`)
+      .catch(function(error) {
+        console.log('failure database put',error);
+      });
+  }
+
+  function deleteArticle(req){
+    return db.none(`DELETE FROM articles WHERE title = '${req.params.title}'`)
+      .catch(function(error) {
+        console.log('failure database delete',error);
+      });
   }
 
   function getArticle(string){
-    return articlesArray[articlesArray.map(function(x){return x.title;}).indexOf(string)];
+    return db.one(`SELECT * FROM articles WHERE title = '${string}'`)
+      .catch(function(error) {
+        console.log('failure database get articles/title', error);
+      });
   }
 
   function getTitles(){
@@ -29,17 +60,6 @@ module.exports = (function(){
     });
   }
 
-  function editArticle(req){
-    for (var key in req.body){
-      articlesArray[articlesArray.map(function(x){return x.title;}).indexOf(Number(req.params.title))][key] = req.body[key];
-    }
-    articlesArray[articlesArray.map(function(x){return x.title;}).indexOf(Number(req.params.title))].urlTitle = encodeURI(req.body.title);
-  }
-
-  function deleteArticle(req){
-    articlesArray.splice(articlesArray.map(function(x){return x.title;}).indexOf(Number(req)),1);
-  }
-
   return {
     getArticles: getArticles,
     getArticle: getArticle,
@@ -47,6 +67,7 @@ module.exports = (function(){
     getIndex: getIndex,
     registerArticle: registerArticle,
     editArticle: editArticle,
-    deleteArticle: deleteArticle
+    deleteArticle: deleteArticle,
+    db: db
   };
 })();

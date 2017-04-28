@@ -26,16 +26,15 @@ app.use(methodOverride('_method'));
 app.use('/articles', articlesRoutes);
 app.use('/products', productsRoutes);
 
-
-// app.get('/', (req, res)=> {
-//   res.render('home', homeData);
-// });
-
 app.get("*", (req, res) => {
-  res.send("404");
+  res.status(404).render('helper/404');
 });
 
-//activate server
-const server = app.listen(3000, () => {
-  console.log('server listening on port 3000');
-});
+if (!module.parent) {
+ //activate server
+  const server = app.listen(3000, () => {
+    console.log('server listening on port 3000');
+  });
+}
+
+module.exports = app;
